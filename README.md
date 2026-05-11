@@ -1,6 +1,6 @@
 # Distributed Rate Limiter as a Service
 
-A production-grade distributed rate limiting microservice built with Java 17 and Spring Boot. Supports three rate limiting algorithms, Redis-backed state management, async analytics via Kafka, and a fully containerised setup with Docker Compose.
+A production-grade distributed rate limiting microservice built with Java 21 and Spring Boot. Supports three rate limiting algorithms, Redis-backed state management, async analytics via Kafka, and a fully containerised setup with Docker Compose.
 
 ---
 
