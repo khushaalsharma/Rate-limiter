@@ -24,4 +24,7 @@ public interface RateLimitEventRepository extends JpaRepository<RateLimitEvent, 
             @Param("key") String clientKey,
             @Param("from") LocalDateTime from,
             @Param("to") LocalDateTime to);
+
+        @Query("SELECT COUNT(e) > 0 FROM RateLimitEvent e WHERE e.eventId = :id")
+        boolean existsByEventId(@Param("id") String eventId);
 }

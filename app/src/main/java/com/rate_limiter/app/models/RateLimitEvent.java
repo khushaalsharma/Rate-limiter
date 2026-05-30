@@ -20,6 +20,9 @@ public class RateLimitEvent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "event_id", unique = true, nullable = false)
+    private String eventId;
+
     @Column(name = "client_key", nullable = false)
     private String clientKey;
 

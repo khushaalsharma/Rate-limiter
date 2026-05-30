@@ -12,6 +12,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -54,6 +55,7 @@ public class RateLimiterService {
                 .endpoint(endpoint)
                 .allowed(result.isAllowed())
                 .remainingRequests(result.getRemainingRequests())
+                .eventId(UUID.randomUUID().toString())
                 .algorithm(algorithm)
                 .timestamp(LocalDateTime.now())
                 .build();
