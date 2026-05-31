@@ -1,7 +1,10 @@
 package com.rate_limiter.app.controller;
 
+import com.rate_limiter.app.DTO.RateLimitConfigRequest;
 import com.rate_limiter.app.models.RateLimitConfig;
 import com.rate_limiter.app.service.ConfigService;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +21,12 @@ public class ConfigController {
     private final ConfigService configService;
 
     @PostMapping
-    public ResponseEntity<RateLimitConfig> createConfig(@RequestBody Map<String, String> body){
+    public ResponseEntity<RateLimitConfig> createConfig(@Valid @RequestBody RateLimitConfigRequest body){
         RateLimitConfig config = configService.createConfig(
-                body.get("clientKey"),
-                Integer.parseInt(body.get("maxRequests")),
-                Integer.parseInt(body.get("windowSeconds")),
-                RateLimitConfig.AlgorithmType.valueOf(body.get("algorithm"))
+                body.getClientKey(),
+                body.getMaxRequests(),
+                body.getWindowSeconds(),
+                body.getAlgorithm()
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(config);

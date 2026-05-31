@@ -3,11 +3,12 @@ package com.rate_limiter.app.service.algorithms;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.concurrent.TimeUnit;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Sliding Window Log algorithm.
@@ -33,36 +34,61 @@ import java.util.concurrent.TimeUnit;
 @Component
 @RequiredArgsConstructor
 public class SlidingWindowAlgorithm implements RateLimitAlgorithm{
+    /*
+        redisKey,
+        nowMillis,
+        maxRequests,
+        windowSeconds,
+        currentThreadId
+    */
+    private final String SLIDING_WINDOW_SCRIPT = """
+                local key = KEYS[1]
+                local nowMillis = tonumber(ARGV[1])
+                local maxRequests = tonumber(ARGV[2])
+                local windowSeconds = tonumber(ARGV[3])
+                local memberSuffix = ARGV[4]
 
+                local windowStart = nowMillis - (windowSeconds * 1000)
+
+                redis.call('ZREMRANGEBYSCORE', key, 0, windowStart)
+
+                local count = redis.call('ZCARD', key)
+
+                if count < maxRequests then
+                    local member = tostring(nowMillis) .. "-" .. memberSuffix
+                    redis.call('ZADD', key, nowMillis, member)
+                    redis.call('EXPIRE', key, windowSeconds * 2)
+                    return {1, maxRequests - count - 1, windowSeconds}
+                else
+                    redis.call('EXPIRE', key, windowSeconds * 2)
+                    return {0, 0, windowSeconds}
+                end
+            """;
+
+    private final DefaultRedisScript<List> redisScript = new DefaultRedisScript<>(SLIDING_WINDOW_SCRIPT, List.class);
     private final RedisTemplate<String, String> redisTemplate;
 
     @Override
     public RateLimitResult isAllowed(String clientKey, int maxRequests, int windowSeconds) {
         String redisKey = "rl:sliding:" + clientKey;
         long nowMillis = Instant.now().toEpochMilli();
-        long windowStartMillis = nowMillis - (windowSeconds * 1000L);
 
-        ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+        List<Long> currentCount = redisTemplate.execute(
+            redisScript,
+            Collections.singletonList(redisKey),
+            nowMillis,
+            maxRequests,
+            windowSeconds   
+        );
 
-        zSetOps.removeRangeByScore(redisKey, 0, windowStartMillis);
+        long resetAfter = currentCount.get(2);
 
-        Long count = zSetOps.zCard(redisKey);
-        long currentCount = count == null ? 0 : count;
-
-        long resetAfter = windowSeconds;
-
-        if(currentCount >= maxRequests){
+        if(currentCount.get(0) != 1L){
             log.debug("SLIDING WINDOW DENIED - key={} count={} max={}", redisKey, currentCount, maxRequests);
             return RateLimitResult.denied(resetAfter);
         }
 
-        //add current request as unique member
-        String member = nowMillis + "-" + Thread.currentThread().getId();
-        zSetOps.add(redisKey, member, nowMillis);
-
-        redisTemplate.expire(redisKey, windowSeconds * 2L, TimeUnit.SECONDS);
-
-        int remaining = (int) (maxRequests - currentCount - 1);
+        int remaining = currentCount.get(1).intValue();
         log.debug("SLIDING WINDOW ALLOWED - key={} count={} remaining={}", redisKey, currentCount, remaining);
 
         return RateLimitResult.allowed(remaining, resetAfter);

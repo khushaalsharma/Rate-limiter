@@ -5,6 +5,10 @@ import com.rate_limiter.app.repository.RateLimitConfigRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +19,7 @@ import java.util.List;
 public class ConfigService {
     private final RateLimitConfigRepository configRepository;
 
+    @CachePut(value = "rateLimitConfigs", key = "#clientKey")
     public RateLimitConfig createConfig(String clientKey, int maxRequests, int windowSeconds, RateLimitConfig.AlgorithmType algorithm){
         if(configRepository.existsByClientKey(clientKey)){
             throw new IllegalArgumentException("config already exists for client: " + clientKey);
@@ -32,6 +37,7 @@ public class ConfigService {
         return saved;
     }
 
+    @Cacheable(value = "rateLimitConfigs", key = "#clientKey")
     public RateLimitConfig getConfig(String clientKey){
         return configRepository.findByClientKey(clientKey)
                 .orElseThrow(() -> new IllegalArgumentException("Client not found: " + clientKey));
@@ -41,6 +47,7 @@ public class ConfigService {
         return configRepository.findAll();
     }
 
+    @CachePut(value = "rateLimitConfigs", key = "#clientKey")
     @Transactional
     public RateLimitConfig updateConfig(String clientKey, int maxRequests,
                                         int windowSeconds, RateLimitConfig.AlgorithmType algorithm) {
@@ -51,6 +58,7 @@ public class ConfigService {
         return configRepository.save(config);
     }
 
+    @CacheEvict(value = "rateLimitConfigs", key = "#clientKey")
     @Transactional
     public void deleteConfig(String clientKey) {
         if (!configRepository.existsByClientKey(clientKey)) {

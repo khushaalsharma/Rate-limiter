@@ -13,6 +13,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
+import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.serializer.JacksonJsonDeserializer;
 import org.springframework.kafka.support.serializer.JacksonJsonSerializer;
 
@@ -96,7 +97,7 @@ public class AppConfig {
         // no deprecated Class<T> constructor needed, fully property-driven
         props.put(JacksonJsonDeserializer.VALUE_DEFAULT_TYPE, RateLimitEventDto.class.getName());
         // Trust our own package; reject anything else for security
-        props.put(JacksonJsonDeserializer.TRUSTED_PACKAGES, "com.rate_limiter.dto");
+        props.put(JacksonJsonDeserializer.TRUSTED_PACKAGES, "com.rate_limiter.app.DTO");
         // Since producer sets ADD_TYPE_INFO_HEADERS=false, tell consumer
         // not to look for type headers and use VALUE_DEFAULT_TYPE instead
         props.put(JacksonJsonDeserializer.USE_TYPE_INFO_HEADERS, false);
@@ -117,6 +118,7 @@ public class AppConfig {
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         factory.setConcurrency(3); // 3 consumer threads in parallel ie each group has three consumer and works ideally if topics are 3+
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
         return factory;
     }
 }

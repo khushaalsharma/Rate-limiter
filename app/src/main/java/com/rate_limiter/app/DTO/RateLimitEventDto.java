@@ -16,6 +16,7 @@ public class RateLimitEventDto {
     private String endpoint;
     private boolean allowed;
     private String algorithm;
+    private String eventId;
     private int remainingRequests;
     private LocalDateTime timestamp;
 }

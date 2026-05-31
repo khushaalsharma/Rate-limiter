@@ -2,7 +2,6 @@ package com.rate_limiter.app.service;
 
 import com.rate_limiter.app.DTO.RateLimitEventDto;
 import com.rate_limiter.app.models.RateLimitConfig;
-import com.rate_limiter.app.repository.RateLimitConfigRepository;
 import com.rate_limiter.app.service.algorithms.FixedWindowAlgorithm;
 import com.rate_limiter.app.service.algorithms.RateLimitResult;
 import com.rate_limiter.app.service.algorithms.SlidingWindowAlgorithm;
@@ -13,27 +12,27 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class RateLimiterService {
-    private final RateLimitConfigRepository rateLimitConfigRepository;
     private final SlidingWindowAlgorithm slidingWindowAlgorithm;
     private final FixedWindowAlgorithm fixedWindowAlgorithm;
     private final TokenBucketAlgorithm tokenBucketAlgorithm;
+    private final ConfigService configService;
     private final KafkaTemplate<String, RateLimitEventDto> kafkaTemplate;
 
     private static final String RATE_LIMIT_TOPIC = "rate-limit-events";
 
     public RateLimitResult checkRateLimit(String clientKey, String endpoint) throws Exception {
-        Optional<RateLimitConfig> config = rateLimitConfigRepository.findByClientKey(clientKey);
+        RateLimitConfig config = configService.getConfig(clientKey);
 
-        if(config.isPresent()){
-            RateLimitResult result = runAlgorithm(config.get());
+        if(config != null){
+            RateLimitResult result = runAlgorithm(config);
 
-            publishEvent(clientKey, endpoint, result, config.get().getAlgorithmType().name());
+            publishEvent(clientKey, endpoint, result, config.getAlgorithmType().name());
 
             return result;
 
@@ -56,6 +55,7 @@ public class RateLimiterService {
                 .endpoint(endpoint)
                 .allowed(result.isAllowed())
                 .remainingRequests(result.getRemainingRequests())
+                .eventId(UUID.randomUUID().toString())
                 .algorithm(algorithm)
                 .timestamp(LocalDateTime.now())
                 .build();
