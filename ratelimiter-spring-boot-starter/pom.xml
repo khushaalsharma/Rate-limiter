@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.khushaalsharma</groupId>
+        <artifactId>ratelimiter-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>ratelimiter-spring-boot-starter</artifactId>
+    <packaging>jar</packaging>
+
+    <!-- No src/main/java here by convention. This module exists purely to give
+         consumers one dependency that pulls in everything they need. -->
+
+    <dependencies>
+        <dependency>
+            <groupId>io.github.khushaalsharma</groupId>
+            <artifactId>ratelimiter-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.khushaalsharma</groupId>
+            <artifactId>ratelimiter-spring-boot-autoconfigure</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- These are the ones EVERY consumer needs regardless of Kafka/JPA choices -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+    </dependencies>
+</project>
