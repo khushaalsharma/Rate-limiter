@@ -32,7 +32,11 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- AOP: needed for RateLimitAspect -->
+        <!-- AOP: no dedicated starter needed post-Boot-4.0 rename.
+             Plain @Aspect/@Around support comes in transitively via
+             spring-context/spring-boot-autoconfigure. If RateLimitAspect
+             later fails to resolve org.aspectj.lang.annotation.Aspect,
+             add org.aspectj:aspectjweaver directly (not a starter). -->
 
         <!-- Redis: needed for the redis-backed algorithms -->
         <dependency>
@@ -68,6 +72,16 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.khushaalsharma</groupId>
+            <artifactId>ratelimiter-core</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
