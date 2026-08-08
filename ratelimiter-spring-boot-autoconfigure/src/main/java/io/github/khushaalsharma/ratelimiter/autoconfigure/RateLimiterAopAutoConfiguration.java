@@ -30,6 +30,7 @@ public class RateLimiterAopAutoConfiguration {
         return new WebRequestPathResolver();
     }
 
+    @Bean
     public RateLimitAspect rateLimitAspect(
             RateLimiter rateLimiter,
             RateLimiterProperties properties,

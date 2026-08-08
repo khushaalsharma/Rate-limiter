@@ -20,12 +20,16 @@
         <dependency>
             <groupId>io.github.khushaalsharma</groupId>
             <artifactId>ratelimiter-core</artifactId>
-            <version>${project.version}</version>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.github.khushaalsharma</groupId>
             <artifactId>ratelimiter-spring-boot-autoconfigure</artifactId>
-            <version>${project.version}</version>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
         </dependency>
 
         <!-- These are the ones EVERY consumer needs regardless of Kafka/JPA choices -->

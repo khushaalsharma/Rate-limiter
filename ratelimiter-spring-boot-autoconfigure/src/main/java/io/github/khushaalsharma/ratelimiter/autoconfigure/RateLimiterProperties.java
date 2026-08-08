@@ -24,11 +24,14 @@ public class RateLimiterProperties {
     public static class Analytics {
         private boolean enabled = false;
         private String topic = "rate-limit-events";
+        private String groupId = "ratelimiter-analytics";
 
         public boolean isEnabled() { return enabled; }
         public void setEnabled(boolean enabled) { this.enabled = enabled; }
         public String getTopic() { return topic; }
         public void setTopic(String topic) { this.topic = topic; }
+        public String getGroupId(){ return groupId; }
+        public void setGroupId(String groupId){ this.groupId = groupId; }
     }
 
     // getters/setters for strategy, algorithm, redis, analytics

@@ -9,9 +9,12 @@ public class RateLimitEventDto {
     private boolean allowed;
     private String algorithm;
     private long remainingRequests;
-    private Instant timestamp;
+    private long timestamp;
 
-    public RateLimitEventDto(String eventId, String clientKey, String endpoint, boolean allowed, String algorithm, long remainingRequests, Instant timestamp) {
+    public RateLimitEventDto() {
+    }
+
+    public RateLimitEventDto(String eventId, String clientKey, String endpoint, boolean allowed, String algorithm, long remainingRequests, long timestamp) {
         this.eventId = eventId;
         this.clientKey = clientKey;
         this.endpoint = endpoint;
@@ -69,11 +72,11 @@ public class RateLimitEventDto {
         this.remainingRequests = remainingRequests;
     }
 
-    public Instant getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Instant timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 }

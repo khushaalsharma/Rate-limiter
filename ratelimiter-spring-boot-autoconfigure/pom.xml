@@ -48,8 +48,8 @@
         <!-- Kafka: only needed if consumer app enables analytics + has Kafka.
              optional=true so it does NOT get forced on every consumer transitively. -->
         <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-kafka</artifactId>
             <optional>true</optional>
         </dependency>
 
@@ -66,6 +66,11 @@
             <artifactId>spring-boot-starter-web</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <optional>true</optional>
+        </dependency>
 
         <!-- Test scope -->
         <dependency>
@@ -77,11 +82,6 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.github.khushaalsharma</groupId>
-            <artifactId>ratelimiter-core</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>

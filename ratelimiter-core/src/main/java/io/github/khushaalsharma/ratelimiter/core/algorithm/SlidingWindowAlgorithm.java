@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 public class SlidingWindowAlgorithm implements RateLimitAlgorithm{
 
@@ -33,16 +34,22 @@ public class SlidingWindowAlgorithm implements RateLimitAlgorithm{
         List<Long> currentCount = template.execute(
                 redisScript,
                 Collections.singletonList(redisKey),
-                nowMillis,
-                maxRequests,
-                windowSeconds
+                String.valueOf(nowMillis),
+                String.valueOf(maxRequests),
+                String.valueOf(windowSeconds),
+                UUID.randomUUID().toString()
         );
+
+        System.out.println(">>>> In SLIDING WINDOW isAllowed:");
+        for(Long val : currentCount){
+            System.out.println(val);
+        }
 
         long resetAfter = currentCount.get(2);
 
-        if(currentCount.get(0) != 1L){
+        if(currentCount.get(0) == 1L){
             //log.debug("SLIDING WINDOW DENIED - key={} count={} max={}", redisKey, currentCount, maxRequests);
-            return new RateLimitDecision(false, 0, resetAfter);
+            return new RateLimitDecision(true, 0, resetAfter);
         }
 
         int remaining = currentCount.get(1).intValue();

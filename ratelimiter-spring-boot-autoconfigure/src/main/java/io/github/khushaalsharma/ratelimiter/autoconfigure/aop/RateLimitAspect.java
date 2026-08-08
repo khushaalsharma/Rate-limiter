@@ -12,10 +12,15 @@ import io.github.khushaalsharma.ratelimiter.core.RateLimiter;
 import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.MDC;
 import org.springframework.boot.convert.DurationStyle;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.time.Instant;
+
+@Aspect
 public class RateLimitAspect {
     private final RateLimiter rateLimiter;
     private final RateLimiterProperties properties;
@@ -39,6 +44,9 @@ public class RateLimitAspect {
     public Object enforce(
             ProceedingJoinPoint pjp, RateLimit rateLimit
     ) throws Throwable{
+
+        System.out.println(">>> RateLimitAspect.enforce() CALLED FOR: " + pjp.getSignature());
+
         HttpServletRequest request = currentRequest();
         String userId = keyResolver.resolve(request);
 
@@ -63,6 +71,8 @@ public class RateLimitAspect {
             throw new RateLimitExceededException(decision);
         }
 
+        System.out.println(">>>> PUBLISHING KAFKA EVENT: " + MDC.get("correlationId") + ", eventPublisher type: " + eventPublisher.getClass().getName());
+
         eventPublisher.publish(new RateLimitEventDto(
                 java.util.UUID.randomUUID().toString(),
                 userId,
@@ -70,7 +80,7 @@ public class RateLimitAspect {
                 decision.allowed(),
                 algorithmType.name(),
                 decision.remainingRequests(),
-                java.time.Instant.now()
+                System.currentTimeMillis()
         ));
 
         return pjp.proceed();

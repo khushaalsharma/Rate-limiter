@@ -9,8 +9,10 @@ import io.github.khushaalsharma.ratelimiter.core.algorithm.TokenBucketAlgorithm;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -20,10 +22,15 @@ import java.util.Map;
 
 @AutoConfiguration
 @ConditionalOnClass({RedisTemplate.class, RedisConnectionFactory.class})
-@EnableConfigurationProperties(RateLimiterProperties.class)
 public class RateLimiterRedisAutoConfiguration {
 
     @Bean
+    public RateLimiterProperties rateLimiterProperties(){
+        return new RateLimiterProperties();
+    }
+
+    @Bean
+    @Primary
     @ConditionalOnMissingBean
     public RedisTemplate<String, String> rateLimiterRedisTemplate(RedisConnectionFactory factory){
         RedisTemplate<String, String> template = new RedisTemplate<>();

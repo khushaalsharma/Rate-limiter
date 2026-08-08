@@ -30,11 +30,11 @@ public class RateLimitEvent {
     private long remainingRequests;
 
     @Column(name = "timestamp", nullable = false)
-    private Instant timestamp;
+    private long timestamp;
 
     protected RateLimitEvent(){}
 
-    public RateLimitEvent(String eventId, String clientKey, String endpoint, boolean allowed, String algorithm, long remainingRequests, Instant timestamp) {
+    public RateLimitEvent(String eventId, String clientKey, String endpoint, boolean allowed, String algorithm, long remainingRequests, long timestamp) {
         this.eventId = eventId;
         this.clientKey = clientKey;
         this.endpoint = endpoint;
@@ -72,7 +72,7 @@ public class RateLimitEvent {
         return remainingRequests;
     }
 
-    public Instant getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 }
