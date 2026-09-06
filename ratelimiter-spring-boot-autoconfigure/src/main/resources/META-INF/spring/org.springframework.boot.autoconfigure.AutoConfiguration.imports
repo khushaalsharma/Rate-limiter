@@ -1,0 +1,5 @@
+io.github.khushaalsharma.ratelimiter.autoconfigure.RateLimiterRedisAutoConfiguration
+io.github.khushaalsharma.ratelimiter.autoconfigure.RateLimiterAopAutoConfiguration
+io.github.khushaalsharma.ratelimiter.autoconfigure.RateLimiterAnalyticsAutoConfiguration
+io.github.khushaalsharma.ratelimiter.autoconfigure.RateLimiterKafkaAnalyticsAutoConfiguration
+io.github.khushaalsharma.ratelimiter.autoconfigure.RateLimiterJpaAnalyticsAutoConfiguration
